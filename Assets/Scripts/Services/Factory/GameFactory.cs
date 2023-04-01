@@ -101,6 +101,8 @@ namespace Services
             
             RotateAroundTarget rotateAroundTarget = camera.GetComponent<RotateAroundTarget>();
             rotateAroundTarget.distanceToTarget = cameraStaticData.DistanceToTargetOnRotation;
+            rotateAroundTarget.keyboardRotationKey = cameraStaticData.KeyboardRotationKey;
+            rotateAroundTarget.mouseRotationKey = cameraStaticData.MouseRotationKey;
             rotateAroundTarget.Construct(_inputService, _raycastService);
         }
     }

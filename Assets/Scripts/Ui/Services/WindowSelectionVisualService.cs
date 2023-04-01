@@ -5,19 +5,16 @@ namespace Ui.Services
 {
     internal class WindowSelectionVisualService : IWindowSelectionVisualService
     {
-        private readonly IGameFactory _factory;
-
         private readonly IInputService _inputService;
         private readonly Camera _camera;
         private Vector3 _endPosition;
 
         private Vector3 _startPosition;
 
-        public WindowSelectionVisualService(IInputService inputService, IGameFactory factory,
+        public WindowSelectionVisualService(IInputService inputService,
             RectTransform rectTransform)
         {
             _inputService = inputService;
-            _factory = factory;
 
             _startPosition = Vector2.zero;
             _endPosition = Vector2.zero;

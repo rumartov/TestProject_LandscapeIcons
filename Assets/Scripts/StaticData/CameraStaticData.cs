@@ -10,5 +10,7 @@ namespace DefaultNamespace.StaticData
         public KeyCode PanningKey = KeyCode.Mouse1;
         [Range(1, 100)] public float PanningSpeed = 25f;
         
+        public KeyCode MouseRotationKey = KeyCode.Mouse1;
+        public KeyCode KeyboardRotationKey = KeyCode.LeftShift;
     }
 }

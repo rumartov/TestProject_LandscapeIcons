@@ -8,6 +8,8 @@ namespace DefaultNamespace
     public sealed class RotateAroundTarget : MonoBehaviour
     {
         public float distanceToTarget;
+        public KeyCode mouseRotationKey;
+        public KeyCode keyboardRotationKey;
         
         private IRaycastService _raycastService;
         private IInputService _inputService;
@@ -52,7 +54,7 @@ namespace DefaultNamespace
 
         private bool RotationControlsInActive()
         {
-            return _inputService.GetKeyUp(ControlConfig.KeyboardRotationKey) || _inputService.GetKeyUp(ControlConfig.MouseRotationKey);
+            return _inputService.GetKeyUp(keyboardRotationKey) || _inputService.GetKeyUp(mouseRotationKey);
         }
 
         private void ResetTarget()
@@ -79,11 +81,11 @@ namespace DefaultNamespace
 
         private void RotateAround()
         {
-            if (_inputService.GetKeyDown(ControlConfig.MouseRotationKey))
+            if (_inputService.GetKeyDown(mouseRotationKey))
             {
                 _previousPosition = _camera.ScreenToViewportPoint(Input.mousePosition);
             }
-            else if (_inputService.GetKey(ControlConfig.MouseRotationKey))
+            else if (_inputService.GetKey(mouseRotationKey))
             {
                 Vector3 newPosition = _camera.ScreenToViewportPoint(Input.mousePosition);
                 Vector3 direction = _previousPosition - newPosition;
@@ -104,14 +106,7 @@ namespace DefaultNamespace
 
         private bool RotationControlsActive()
         {
-            return _inputService.GetKey(ControlConfig.KeyboardRotationKey) && _inputService.GetKey(ControlConfig.MouseRotationKey);
+            return _inputService.GetKey(keyboardRotationKey) && _inputService.GetKey(mouseRotationKey);
         }
     }
-}
-
-public static class ControlConfig
-{
-    public static KeyCode MouseRotationKey = KeyCode.Mouse1;
-    public static KeyCode KeyboardRotationKey = KeyCode.LeftShift;
-    public static float RotationTargetDistance = 10f;
 }
