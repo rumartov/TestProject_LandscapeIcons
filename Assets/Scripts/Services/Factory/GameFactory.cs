@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+using DefaultNamespace;
+using DefaultNamespace.StaticData;
+using RTS_Cam;
 using Ui.Elemets;
 using Ui.Factory;
 using Ui.Services;
@@ -16,11 +19,13 @@ namespace Services
         private readonly IRaycastService _raycastService;
         private readonly UiFactory _uiFactory;
         private readonly IWindowService _windowService;
+        private readonly IStaticDataService _staticData;
+        
         private IWindowSelectionService _selectionWindowService;
 
         public GameFactory(AssetProvider assets, IWindowService windowService, UiFactory uiFactory,
-            IRandomService random,
-            IRaycastService raycastService, IInputService inputService)
+            IRandomService random, IRaycastService raycastService, IInputService inputService,
+            IStaticDataService staticData)
         {
             _assets = assets;
             _windowService = windowService;
@@ -28,6 +33,7 @@ namespace Services
             _random = random;
             _raycastService = raycastService;
             _inputService = inputService;
+            _staticData = staticData;
 
             WindowIconList = new List<WindowIcon>();
         }
@@ -81,6 +87,21 @@ namespace Services
             }
 
             return list;
+        }
+        
+        public void CreateCamera()
+        {
+            Camera camera = Camera.main;
+
+            CameraStaticData cameraStaticData = _staticData.ForCamera();
+            
+            RTS_Camera rtsCamera = camera.GetComponent<RTS_Camera>();
+            rtsCamera.panningKey = cameraStaticData.PanningKey;
+            rtsCamera.panningSpeed = cameraStaticData.PanningSpeed;
+            
+            RotateAroundTarget rotateAroundTarget = camera.GetComponent<RotateAroundTarget>();
+            rotateAroundTarget.distanceToTarget = cameraStaticData.DistanceToTargetOnRotation;
+            rotateAroundTarget.Construct(_inputService, _raycastService);
         }
     }
 }

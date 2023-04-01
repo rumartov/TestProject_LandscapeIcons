@@ -34,6 +34,7 @@ namespace Ui.Services
                     Debug.DrawRay(_camera.transform.position, _inputService.MousePosition(), Color.blue, 4f);
                     if (_raycastService.PhysicsRaycast(ray, out var hit))
                     {
+                        Debug.Log(hit.point);
                         var spawnPosition = WindowIconInitPoint(hit);
                         _factory.CreateWindowIcon(spawnPosition);
                     }

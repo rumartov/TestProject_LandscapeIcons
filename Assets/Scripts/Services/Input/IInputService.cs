@@ -20,5 +20,8 @@ namespace Services
         bool IsMouseButtonHeld();
         bool IsMouseButtonUp();
         bool LeftMouseHold();
+        bool GetKey(KeyCode keyCode);
+        bool GetKeyDown(KeyCode keyCode);
+        bool GetKeyUp(KeyCode keyCode);
     }
 }

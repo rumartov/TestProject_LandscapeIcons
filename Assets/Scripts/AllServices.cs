@@ -1,4 +1,5 @@
-﻿using Services;
+﻿using DefaultNamespace;
+using Services;
 using Ui.Factory;
 using Ui.Services;
 using UnityEngine;
@@ -19,9 +20,11 @@ public sealed class AllServices : MonoBehaviour
     private IWindowSelectionService _windowSelectionService;
     private WindowSelectionVisualService _windowSelectionVisualService;
     private WindowService _windowService;
+    private IStaticDataService _staticData;
 
     private void Awake()
     {
+        _staticData = new StaticDataService();
         _inputService = new InputService();
         _assets = new AssetProvider();
         _random = new RandomService();
@@ -29,7 +32,7 @@ public sealed class AllServices : MonoBehaviour
 
         _uiFactory = new UiFactory(_assets);
         _windowService = new WindowService(_uiFactory);
-        _factory = new GameFactory(_assets, _windowService, _uiFactory, _random, _raycastService, _inputService);
+        _factory = new GameFactory(_assets, _windowService, _uiFactory, _random, _raycastService, _inputService, _staticData);
 
 
         _windowSelectionVisualService = new WindowSelectionVisualService(_inputService, _factory, rectTransform);
@@ -46,7 +49,10 @@ public sealed class AllServices : MonoBehaviour
     {
         updateService.Construct(_inputService);
 
+        _staticData.Load();
+
         _uiFactory.CreateUiRoot();
         _factory.CreateHud();
+        _factory.CreateCamera();
     }
 }
