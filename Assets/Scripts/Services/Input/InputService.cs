@@ -8,8 +8,10 @@ namespace Services
         public Action OnMouseClick { get; set; }
         public Action OnMouseHold { get; set; }
         public Action OnMouseUp { get; set; }
+        
+        public Action<KeyCode> OnKeyDown { get; set; }
 
-        public bool IsMouseButtonClicked()
+        public bool IsMouseButtonDown()
         {
             var isMouseButtonDown = Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1);
             if (isMouseButtonDown) OnMouseClick?.Invoke();
@@ -17,7 +19,7 @@ namespace Services
             return isMouseButtonDown;
         }
 
-        public bool IsMouseButtonHeld()
+        public bool IsMouseButtonHold()
         {
             var isMouseButtonHeld = Input.GetMouseButton(0) || Input.GetMouseButton(1);
             if (isMouseButtonHeld) OnMouseHold?.Invoke();
@@ -32,7 +34,18 @@ namespace Services
 
             return isMouseButtonUp;
         }
-
+        
+        public void IsKeyCodeDown()
+        {
+            foreach (KeyCode keyCode in Enum.GetValues(typeof(KeyCode)))
+            {
+                if (Input.GetKeyDown(keyCode))
+                {
+                    OnKeyDown?.Invoke(keyCode);
+                }
+            }
+        }
+        
         public bool LeftMouseHold()
         {
             return Input.GetMouseButton(0);
@@ -45,6 +58,7 @@ namespace Services
         
         public bool GetKeyDown(KeyCode keyCode)
         {
+            OnKeyDown?.Invoke(keyCode);
             return Input.GetKeyDown(keyCode);
         }
 

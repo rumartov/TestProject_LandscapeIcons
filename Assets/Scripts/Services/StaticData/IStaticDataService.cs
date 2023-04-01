@@ -1,4 +1,5 @@
 ﻿using DefaultNamespace.StaticData;
+using UnityEngine;
 
 namespace DefaultNamespace
 {
@@ -6,5 +7,6 @@ namespace DefaultNamespace
     {
         void Load();
         CameraStaticData ForCamera();
+        ControlsStaticData ForControls();
     }
 }

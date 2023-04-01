@@ -1,9 +1,10 @@
 using Ui.Window;
+using UnityEngine;
 
 namespace Ui.Services
 {
     public interface IWindowService
     {
-        void Open(WindowId windowId);
+        GameObject Open(WindowId windowId);
     }
 }

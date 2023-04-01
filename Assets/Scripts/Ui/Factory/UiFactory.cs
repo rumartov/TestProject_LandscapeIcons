@@ -9,12 +9,15 @@ namespace Ui.Factory
     {
         private readonly AssetProvider _assete;
         private readonly IAssetProvider _assets;
+        private readonly IInputService _inputService;
+        
         private IWindowEditingService _windowEditingService;
         private IWindowPlacingService _windowPlacingService;
 
-        public UiFactory(AssetProvider assets)
+        public UiFactory(AssetProvider assets, IInputService inputService)
         {
             _assets = assets;
+            _inputService = inputService;
         }
 
         public GameObject IconEditMenu { get; set; }
@@ -36,16 +39,18 @@ namespace Ui.Factory
         public GameObject CreateEditIconMenu()
         {
             DestroyMenuIfExist();
-
+            
             var iconEditMenu = _assets.Instantiate(AssetPath.IconEditMenu, UiRoot);
-            iconEditMenu.GetComponent<IconEditMenu>().Construct(_windowPlacingService, _windowEditingService);
+
+            IconEditMenu editMenu = iconEditMenu.GetComponent<IconEditMenu>();
+            editMenu.Construct(_windowEditingService);
 
             IconEditMenu = iconEditMenu;
 
             return iconEditMenu;
         }
 
-        public void InjectWindowServices(IWindowPlacingService windowPlacingService,
+        public void InjectWindowServices(IWindowPlacingService windowPlacingService, 
             IWindowEditingService windowEditingService)
         {
             _windowPlacingService = windowPlacingService;

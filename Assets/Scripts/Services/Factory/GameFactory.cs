@@ -60,7 +60,7 @@ namespace Services
             windowIconComponent.Construct(windowIconId);
 
             var windowIconMovement = windowIcon.GetComponent<WindowIconMovement>();
-            windowIconMovement.Construct(_raycastService, _inputService);
+            windowIconMovement.Construct(_raycastService);
 
             DestroyIconCreationMenu();
 
@@ -103,6 +103,7 @@ namespace Services
             rotateAroundTarget.distanceToTarget = cameraStaticData.DistanceToTargetOnRotation;
             rotateAroundTarget.keyboardRotationKey = cameraStaticData.KeyboardRotationKey;
             rotateAroundTarget.mouseRotationKey = cameraStaticData.MouseRotationKey;
+            
             rotateAroundTarget.Construct(_inputService, _raycastService);
         }
     }

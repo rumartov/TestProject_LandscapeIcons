@@ -24,13 +24,14 @@ public sealed class AllServices : MonoBehaviour
 
     private void Awake()
     {
-        _staticData = new StaticDataService();
+        InitializeStaticDataService();
+
         _inputService = new InputService();
         _assets = new AssetProvider();
         _random = new RandomService();
         _raycastService = new RaycastService();
 
-        _uiFactory = new UiFactory(_assets);
+        _uiFactory = new UiFactory(_assets, _inputService);
         _windowService = new WindowService(_uiFactory);
         _factory = new GameFactory(_assets, _windowService, _uiFactory, _random, _raycastService, _inputService, _staticData);
 
@@ -40,17 +41,21 @@ public sealed class AllServices : MonoBehaviour
             _raycastService);
         _windowPlacingService = new WindowPlacingService(_inputService, _factory, _raycastService);
         _windowEditingService = new WindowEditingService(_inputService, _windowPlacingService, _windowSelectionService,
-            _windowService, _raycastService);
+            _windowService, _raycastService, _staticData);
 
         _uiFactory.InjectWindowServices(_windowPlacingService, _windowEditingService);
+    }
+
+    private void InitializeStaticDataService()
+    {
+        _staticData = new StaticDataService();
+        _staticData.Load();
     }
 
     private void Start()
     {
         updateService.Construct(_inputService);
-
-        _staticData.Load();
-
+        
         _uiFactory.CreateUiRoot();
         _factory.CreateHud();
         _factory.CreateCamera();

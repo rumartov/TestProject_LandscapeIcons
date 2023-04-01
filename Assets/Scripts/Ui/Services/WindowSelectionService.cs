@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Services;
 using Ui.Window;
@@ -18,6 +19,9 @@ namespace Ui.Services
         private Vector3 _cachedMousePosition = Vector3.zero;
 
         private Dictionary<int, Vector3> _windowIdToMousePosition;
+        public List<WindowBase> SelectedWindowsList { get; set; }
+        public Action OnDeselectAll { get; set; }
+
 
         public WindowSelectionService(IInputService inputService, IGameFactory factory,
             IWindowSelectionVisualService windowSelectionVisualService, IRaycastService raycastService)
@@ -38,8 +42,6 @@ namespace Ui.Services
             _inputService.OnMouseClick += OnClick;
             _inputService.OnMouseHold += OnHold;
         }
-
-        public List<WindowBase> SelectedWindowsList { get; set; }
 
         public void OnClick()
         {
@@ -65,6 +67,7 @@ namespace Ui.Services
         {
             SelectedWindowsList.ForEach(x => x.UnHighlight());
             SelectedWindowsList = new List<WindowBase>();
+            OnDeselectAll?.Invoke();
         }
 
         private void OnClickUp()
@@ -107,7 +110,7 @@ namespace Ui.Services
                 {
                     if (data.layer == LayerMask.NameToLayer("UI"))
                     {
-                        DeselectAll();
+                        //DeselectAll();
                         return;
                     }
 
@@ -143,7 +146,6 @@ namespace Ui.Services
                     var windowIcon = (WindowIcon) windowBase;
                     if (!_windowIdToMousePosition.ContainsKey(windowIcon.WindowIconId))
                         continue;
-
 
                     windowBase.transform.position =
                         raycastHit.point - _windowIdToMousePosition[windowIcon.WindowIconId];

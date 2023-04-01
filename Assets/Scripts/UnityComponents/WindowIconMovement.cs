@@ -5,9 +5,6 @@ namespace UnityComponents
 {
     public sealed class WindowIconMovement : MonoBehaviour
     {
-        private Camera _camera;
-
-        private IInputService _inputService;
         private IRaycastService _raycastService;
 
         public void Update()
@@ -29,11 +26,9 @@ namespace UnityComponents
                 transform.position.z);
         }
 
-        public void Construct(IRaycastService raycastService, IInputService inputService)
+        public void Construct(IRaycastService raycastService)
         {
             _raycastService = raycastService;
-            _inputService = inputService;
-            _camera = Camera.main;
         }
     }
 }

@@ -7,5 +7,6 @@ namespace Ui.Services
     {
         List<WindowBase> CurrentEditingWindowIconsList { get; set; }
         public void Edit();
+        void DeleteSelectedWindowsIcons();
     }
 }

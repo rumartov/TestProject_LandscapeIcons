@@ -1,5 +1,6 @@
 using Ui.Factory;
 using Ui.Window;
+using UnityEngine;
 
 namespace Ui.Services
 {
@@ -12,19 +13,19 @@ namespace Ui.Services
             _uiFactory = uiFactory;
         }
 
-        public void Open(WindowId windowId)
+        public GameObject Open(WindowId windowId)
         {
             switch (windowId)
             {
                 case WindowId.None:
                     break;
                 case WindowId.CreateWindowIconMenu:
-                    _uiFactory.CreateIconsCreationMenu();
-                    break;
+                    return _uiFactory.CreateIconsCreationMenu();
                 case WindowId.WindowIcon:
-                    _uiFactory.CreateEditIconMenu();
-                    break;
+                    return _uiFactory.CreateEditIconMenu();
             }
+
+            return null;
         }
     }
 }

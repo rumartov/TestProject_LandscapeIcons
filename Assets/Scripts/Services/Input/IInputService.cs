@@ -8,6 +8,7 @@ namespace Services
         public Action OnMouseClick { get; set; }
         public Action OnMouseHold { get; set; }
         public Action OnMouseUp { get; set; }
+        Action<KeyCode> OnKeyDown { get; set; }
         public bool RightMouseDown();
 
         public bool LeftMouseDown();
@@ -15,13 +16,14 @@ namespace Services
         public Vector3 MousePosition();
 
         public bool LeftCtrl();
-        bool IsMouseButtonClicked();
+        bool IsMouseButtonDown();
         bool LeftMouseUp();
-        bool IsMouseButtonHeld();
+        bool IsMouseButtonHold();
         bool IsMouseButtonUp();
         bool LeftMouseHold();
         bool GetKey(KeyCode keyCode);
         bool GetKeyDown(KeyCode keyCode);
         bool GetKeyUp(KeyCode keyCode);
+        void IsKeyCodeDown();
     }
 }

@@ -1,3 +1,4 @@
+using DefaultNamespace;
 using TMPro;
 using Ui.Services;
 using UnityEngine;
@@ -11,11 +12,10 @@ namespace Ui.Window
         [SerializeField] private Button deleteWindowIconsButton;
         private IWindowEditingService _windowEditingService;
 
-        private IWindowPlacingService _windowPlacingService;
-
-        public void Construct(IWindowPlacingService windowPlacingService, IWindowEditingService windowEditingService)
+        private IStaticDataService _staticData;
+        
+        public void Construct(IWindowEditingService windowEditingService)
         {
-            _windowPlacingService = windowPlacingService;
             _windowEditingService = windowEditingService;
 
             inputField.onSubmit.AddListener(UpdateWindowIconsText);
@@ -24,9 +24,7 @@ namespace Ui.Window
 
         private void DeleteSelectedWindowsIcons()
         {
-            foreach (WindowIcon windowIcon in _windowEditingService.CurrentEditingWindowIconsList)
-                Destroy(windowIcon.gameObject);
-            Destroy(gameObject);
+            _windowEditingService.DeleteSelectedWindowsIcons();
         }
 
         private void UpdateWindowIconsText(string targetText)

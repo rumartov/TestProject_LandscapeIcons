@@ -8,9 +8,10 @@ namespace Services
 
         private void Update()
         {
-            _inputService?.IsMouseButtonClicked();
-            _inputService?.IsMouseButtonHeld();
+            _inputService?.IsMouseButtonDown();
+            _inputService?.IsMouseButtonHold();
             _inputService?.IsMouseButtonUp();
+            _inputService?.IsKeyCodeDown();
         }
 
         public void Construct(IInputService inputService)
