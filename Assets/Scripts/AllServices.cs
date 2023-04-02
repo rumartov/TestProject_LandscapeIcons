@@ -2,6 +2,7 @@
 using Services;
 using Ui.Factory;
 using Ui.Services;
+using Ui.Window;
 using UnityEngine;
 
 public sealed class AllServices : MonoBehaviour
@@ -21,20 +22,22 @@ public sealed class AllServices : MonoBehaviour
     private WindowSelectionVisualService _windowSelectionVisualService;
     private WindowService _windowService;
     private IStaticDataService _staticData;
+    private IAnimationService _animationService;
 
     private void Awake()
     {
         InitializeStaticDataService();
 
+        _animationService = new AnimationService();
         _inputService = new InputService();
         _assets = new AssetProvider();
         _random = new RandomService();
         _raycastService = new RaycastService();
 
-        _uiFactory = new UiFactory(_assets, _inputService);
+        _uiFactory = new UiFactory(_assets, _inputService, _animationService);
         _windowService = new WindowService(_uiFactory);
-        _factory = new GameFactory(_assets, _windowService, _uiFactory, _random, _raycastService, _inputService, _staticData);
-
+        _factory = new GameFactory(_assets, _windowService, _uiFactory, _random, _raycastService, _inputService, 
+            _staticData, _animationService);
 
         _windowSelectionVisualService = new WindowSelectionVisualService(_inputService, rectTransform);
         _windowSelectionService = new WindowSelectionService(_inputService, _factory, _windowSelectionVisualService,

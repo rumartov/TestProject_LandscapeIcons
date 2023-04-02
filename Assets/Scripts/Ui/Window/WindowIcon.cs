@@ -6,11 +6,14 @@ namespace Ui.Window
 {
     public class WindowIcon : WindowBase, ISelectableWindow
     {
+        //TODO add animation static data
+        [SerializeField] private float duration = 0.5f;
         [SerializeField] private TextMeshProUGUI tmpText;
 
         private Vector3 _baseLocalScale;
 
         private string _text;
+        private IAnimationService _animationService;
         public Action OnTextUpdate { get; set; }
 
         public string Text
@@ -31,13 +34,19 @@ namespace Ui.Window
             _baseLocalScale = transform.localScale;
         }
 
-        public void Construct(int windowIconId)
+        public void Construct(int windowIconId, IAnimationService animationService)
         {
+            base.Construct(animationService);
+            
             WindowIconId = windowIconId;
             WindowId = WindowId.WindowIcon;
 
             Text = "New WindowIcon";
             OnTextUpdate += UpdateIcon;
+
+            _animationService = animationService;
+            
+            _animationService.ScaleUp(transform, duration);
         }
 
         private void UpdateIcon()
@@ -61,7 +70,6 @@ namespace Ui.Window
         protected override void Cleanup()
         {
             base.Cleanup();
-
             OnTextUpdate -= UpdateIcon;
         }
     }

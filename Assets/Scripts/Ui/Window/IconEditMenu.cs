@@ -1,4 +1,5 @@
 using DefaultNamespace;
+using DG.Tweening;
 using TMPro;
 using Ui.Services;
 using UnityEngine;
@@ -14,14 +15,16 @@ namespace Ui.Window
 
         private IStaticDataService _staticData;
         
-        public void Construct(IWindowEditingService windowEditingService)
+        public void Construct(IAnimationService animationService, IWindowEditingService windowEditingService)
         {
+            base.Construct(animationService);
+            
             _windowEditingService = windowEditingService;
 
             inputField.onSubmit.AddListener(UpdateWindowIconsText);
             deleteWindowIconsButton.onClick.AddListener(DeleteSelectedWindowsIcons);
         }
-
+        
         private void DeleteSelectedWindowsIcons()
         {
             _windowEditingService.DeleteSelectedWindowsIcons();

@@ -10,17 +10,19 @@ namespace Ui.Factory
         private readonly AssetProvider _assete;
         private readonly IAssetProvider _assets;
         private readonly IInputService _inputService;
-        
+        private readonly IAnimationService _animationService;
+
         private IWindowEditingService _windowEditingService;
         private IWindowPlacingService _windowPlacingService;
 
-        public UiFactory(AssetProvider assets, IInputService inputService)
+        public UiFactory(AssetProvider assets, IInputService inputService, IAnimationService animationService)
         {
             _assets = assets;
             _inputService = inputService;
+            _animationService = animationService;
         }
 
-        public GameObject IconEditMenu { get; set; }
+        public IconEditMenu IconEditMenu { get; set; }
         public Transform UiRoot { get; set; }
 
         public void CreateUiRoot()
@@ -32,7 +34,7 @@ namespace Ui.Factory
         public GameObject CreateIconsCreationMenu()
         {
             var iconCreationMenu = _assets.Instantiate(AssetPath.IconCreationMenu, UiRoot);
-            iconCreationMenu.GetComponent<IconCreationMenu>().Construct(_windowPlacingService);
+            iconCreationMenu.GetComponent<IconCreationMenu>().Construct(_animationService, _windowPlacingService);
             return iconCreationMenu;
         }
 
@@ -43,9 +45,9 @@ namespace Ui.Factory
             var iconEditMenu = _assets.Instantiate(AssetPath.IconEditMenu, UiRoot);
 
             IconEditMenu editMenu = iconEditMenu.GetComponent<IconEditMenu>();
-            editMenu.Construct(_windowEditingService);
+            editMenu.Construct(_animationService, _windowEditingService);
 
-            IconEditMenu = iconEditMenu;
+            IconEditMenu = editMenu;
 
             return iconEditMenu;
         }
@@ -59,7 +61,7 @@ namespace Ui.Factory
 
         private void DestroyMenuIfExist()
         {
-            if (IconEditMenu != null) Object.Destroy(IconEditMenu);
+            if (IconEditMenu != null) IconEditMenu.Close();
         }
     }
 }

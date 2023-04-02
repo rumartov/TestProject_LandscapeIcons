@@ -19,7 +19,7 @@ namespace Ui.Services
         private readonly IWindowSelectionService _windowSelectionService;
         private readonly IWindowService _windowService;
 
-        private GameObject _currentEditingWindow;
+        private IconEditMenu _currentEditingWindow;
 
         public WindowEditingService(IInputService inputService, IWindowPlacingService windowPlacingService,
             IWindowSelectionService windowSelectionService, IWindowService windowService, 
@@ -66,20 +66,21 @@ namespace Ui.Services
 
                     CurrentEditingWindowIconsList = _windowSelectionService.SelectedWindowsList;
 
-                    _currentEditingWindow = _windowService.Open(windowId);
+                    _currentEditingWindow = _windowService.Open(windowId).GetComponent<IconEditMenu>();
                 }
         }
 
         public void DeleteSelectedWindowsIcons()
         {
             foreach (WindowIcon windowIcon in CurrentEditingWindowIconsList)
-                Object.Destroy(windowIcon.gameObject);
+                windowIcon.Close();
+            
             DeleteEditingMenu();
         }
 
         private void DeleteEditingMenu()
         {
-            Object.Destroy(_currentEditingWindow);
+            if(_currentEditingWindow != null) _currentEditingWindow.Close();
         }
 
         private bool HasWindowIcon(GameObject hit)

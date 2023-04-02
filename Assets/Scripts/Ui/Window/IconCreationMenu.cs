@@ -1,4 +1,5 @@
-﻿using Ui.Services;
+﻿using System.Collections;
+using Ui.Services;
 
 namespace Ui.Window
 {
@@ -6,12 +7,14 @@ namespace Ui.Window
     {
         private IWindowPlacingService _windowPlacingService;
 
-        public void Construct(IWindowPlacingService windowPlacingService)
+        public void Construct(IAnimationService animationService, IWindowPlacingService windowPlacingService)
         {
+            base.Construct(animationService);
+            
             _windowPlacingService = windowPlacingService;
             _windowPlacingService.IsPlacing = true;
         }
-
+        
         protected override void Cleanup()
         {
             base.Cleanup();

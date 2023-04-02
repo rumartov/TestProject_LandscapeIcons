@@ -20,12 +20,13 @@ namespace Services
         private readonly UiFactory _uiFactory;
         private readonly IWindowService _windowService;
         private readonly IStaticDataService _staticData;
-        
+        private readonly IAnimationService _animationService;
+
         private IWindowSelectionService _selectionWindowService;
 
         public GameFactory(AssetProvider assets, IWindowService windowService, UiFactory uiFactory,
             IRandomService random, IRaycastService raycastService, IInputService inputService,
-            IStaticDataService staticData)
+            IStaticDataService staticData, IAnimationService animationService)
         {
             _assets = assets;
             _windowService = windowService;
@@ -34,6 +35,7 @@ namespace Services
             _raycastService = raycastService;
             _inputService = inputService;
             _staticData = staticData;
+            _animationService = animationService;
 
             WindowIconList = new List<WindowIcon>();
         }
@@ -57,7 +59,7 @@ namespace Services
             var windowIconId = (int) _random.Range(0, Config.MaxWindowIconIdRange);
 
             var windowIconComponent = windowIcon.GetComponent<WindowIcon>();
-            windowIconComponent.Construct(windowIconId);
+            windowIconComponent.Construct(windowIconId, _animationService);
 
             var windowIconMovement = windowIcon.GetComponent<WindowIconMovement>();
             windowIconMovement.Construct(_raycastService);
@@ -73,7 +75,7 @@ namespace Services
 
         private void DestroyIconCreationMenu()
         {
-            Object.Destroy(_uiFactory.UiRoot.GetComponentInChildren<IconCreationMenu>().gameObject);
+            _uiFactory.UiRoot.GetComponentInChildren<IconCreationMenu>().Close();
         }
 
         private List<WindowIcon> UpdateWindowIconList()

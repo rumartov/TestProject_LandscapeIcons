@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DefaultNamespace;
+using DG.Tweening;
 using Services;
 using Ui.Window;
 using UnityEngine;
