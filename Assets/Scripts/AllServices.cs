@@ -38,7 +38,7 @@ public sealed class AllServices : MonoBehaviour
 
         _windowSelectionVisualService = new WindowSelectionVisualService(_inputService, rectTransform);
         _windowSelectionService = new WindowSelectionService(_inputService, _factory, _windowSelectionVisualService,
-            _raycastService);
+            _raycastService, _staticData);
         _windowPlacingService = new WindowPlacingService(_inputService, _factory, _raycastService);
         _windowEditingService = new WindowEditingService(_inputService, _windowPlacingService, _windowSelectionService,
             _windowService, _raycastService, _staticData);

@@ -8,9 +8,12 @@ namespace DefaultNamespace
     {
         private const string CameraDataPath = "StaticData/Camera";
         private const string ControlsDataPath = "StaticData/Controls";
+        private const string TerrainDataPath = "StaticData/Terrain";
 
         private CameraStaticData _cameraStaticData;
         private ControlsStaticData _controlsStaticData;
+        private TerrainStaticData _terrainStaticData;
+
 
         public void Load()
         {
@@ -20,6 +23,10 @@ namespace DefaultNamespace
             
             _controlsStaticData = Resources
                 .LoadAll<ControlsStaticData>(ControlsDataPath)
+                .First();
+            
+            _terrainStaticData = Resources
+                .LoadAll<TerrainStaticData>(TerrainDataPath)
                 .First();
         }
 
@@ -31,6 +38,11 @@ namespace DefaultNamespace
         public ControlsStaticData ForControls()
         {
             return _controlsStaticData;
+        }
+        
+        public TerrainStaticData ForTerrain()
+        {
+            return _terrainStaticData;
         }
     }
 }

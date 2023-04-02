@@ -8,5 +8,6 @@ namespace DefaultNamespace
         void Load();
         CameraStaticData ForCamera();
         ControlsStaticData ForControls();
+        TerrainStaticData ForTerrain();
     }
 }

@@ -1,4 +1,5 @@
-﻿using Services;
+﻿using DefaultNamespace;
+using Services;
 using UnityEngine;
 
 namespace UnityComponents
@@ -8,6 +9,16 @@ namespace UnityComponents
         private IRaycastService _raycastService;
 
         public void Update()
+        {
+            MoveIcon();
+        }
+
+        public void Construct(IRaycastService raycastService)
+        {
+            _raycastService = raycastService;
+        }
+
+        private void MoveIcon()
         {
             var maxDistance = 100f;
             var defaultOffset = 3f;
@@ -24,11 +35,6 @@ namespace UnityComponents
                 transform.position.x,
                 height + extraOffset,
                 transform.position.z);
-        }
-
-        public void Construct(IRaycastService raycastService)
-        {
-            _raycastService = raycastService;
         }
     }
 }

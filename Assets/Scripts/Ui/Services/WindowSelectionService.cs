@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DefaultNamespace;
 using Services;
 using Ui.Window;
 using UnityEngine;
@@ -13,6 +14,10 @@ namespace Ui.Services
 
         private readonly IInputService _inputService;
         private readonly IRaycastService _raycastService;
+        private readonly IStaticDataService _staticData;
+        
+        private readonly TerrainStaticData _terrain;
+        private const int DistanceFromBounds = 3;
 
         private readonly int _defaultLayerMask;
         private readonly IWindowSelectionVisualService _windowSelectionVisualService;
@@ -24,28 +29,40 @@ namespace Ui.Services
 
 
         public WindowSelectionService(IInputService inputService, IGameFactory factory,
-            IWindowSelectionVisualService windowSelectionVisualService, IRaycastService raycastService)
+            IWindowSelectionVisualService windowSelectionVisualService, IRaycastService raycastService, 
+            IStaticDataService staticData)
         {
             _inputService = inputService;
             _factory = factory;
             _windowSelectionVisualService = windowSelectionVisualService;
             _raycastService = raycastService;
+            _staticData = staticData;
 
+            _terrain = _staticData.ForTerrain();
+            
             SelectedWindowsList = new List<WindowBase>();
             _windowIdToMousePosition = new Dictionary<int, Vector3>();
 
-            _defaultLayerMask = 1 << 0;
+            _defaultLayerMask = LayerMask.NameToLayer("MovableWindow");
+
 
             _camera = Camera.main;
 
-            _inputService.OnMouseUp += OnClickUp;
             _inputService.OnMouseClick += OnClick;
             _inputService.OnMouseHold += OnHold;
         }
 
         public void OnClick()
         {
-            if (_inputService.LeftMouseDown()) WindowIconSelection();
+            if (_inputService.LeftMouseDown())
+            {
+                WindowIconSelection();
+            
+                _windowIdToMousePosition = new Dictionary<int, Vector3>();
+                AddWindowIconsClickPosition();
+
+                _camera.EnablePanning();    
+            }
         }
 
         public void Select(WindowBase window)
@@ -70,33 +87,47 @@ namespace Ui.Services
             OnDeselectAll?.Invoke();
         }
 
-        private void OnClickUp()
+        private void AddWindowIconsClickPosition()
         {
-            if (_inputService.LeftMouseUp())
-            {
-                _windowIdToMousePosition = new Dictionary<int, Vector3>();
-                SettingMovingWindowIconsCameraOffset();
+            Vector3 mousePos = _inputService.MousePosition();
+            mousePos.z = 100f;
+            mousePos = _camera.ScreenToWorldPoint(mousePos);
 
-                _camera.EnablePanning();
+            if (Input.GetMouseButtonDown(0))
+            {
+                Ray ray = _camera.ScreenPointToRay(_inputService.MousePosition());
+
+                if (Physics.Raycast(ray, out var raycastHit, 100))
+                {
+                    Debug.DrawRay(_camera.transform.position, mousePos - _camera.transform.position,
+                        Color.yellow, 2);
+                   
+                    foreach (var windowBase in SelectedWindowsList)
+                    {
+                        var windowIcon = (WindowIcon) windowBase;
+
+                        if (!InTerrainBounds(windowIcon.transform.position) && !InTerrainBounds(raycastHit.point))
+                        {
+                            break;
+                        }
+                        
+                        if (_windowIdToMousePosition.ContainsKey(windowIcon.WindowIconId))
+                            continue;
+
+                        var windowIconToMousePosition = raycastHit.point - windowBase.transform.position;
+                        
+                        _windowIdToMousePosition.Add(windowIcon.WindowIconId, windowIconToMousePosition);
+                    }
+                }
             }
         }
-
-        private void SettingMovingWindowIconsCameraOffset()
+    
+        private bool InTerrainBounds(Vector3 targetPosition)
         {
-            var ray = _camera.ScreenPointToRay(_inputService.MousePosition());
-            Debug.DrawRay(_camera.transform.position, _inputService.MousePosition(), Color.blue, 4f);
-            if (_raycastService.PhysicsRaycast(ray, out var raycastHit, _defaultLayerMask))
-                foreach (var windowBase in SelectedWindowsList)
-                {
-                    var windowIcon = (WindowIcon) windowBase;
-
-                    if (_windowIdToMousePosition.ContainsKey(windowIcon.WindowIconId))
-                        continue;
-
-                    var windowIconToMousePosition = raycastHit.point - windowBase.transform.position;
-
-                    _windowIdToMousePosition.Add(windowIcon.WindowIconId, windowIconToMousePosition);
-                }
+            return _terrain.LegthX - DistanceFromBounds >= targetPosition.x
+                   && _terrain.WidthZ - DistanceFromBounds >= targetPosition.z
+                   && 0 + DistanceFromBounds <= targetPosition.x
+                   && 0 + DistanceFromBounds <= targetPosition.z;
         }
 
         private void WindowIconSelection()
@@ -134,21 +165,38 @@ namespace Ui.Services
 
         private void MoveSelected()
         {
-            if (!MinimalTouchReached())
-                return;
+            Debug.Log("MoveSeelcted");
 
+            Vector3 mousePos = _inputService.MousePosition();
+            mousePos.z = 100f;
+            mousePos = _camera.ScreenToWorldPoint(mousePos);
+            
             var ray = _camera.ScreenPointToRay(_inputService.MousePosition());
-            //Debug.DrawRay(_camera.transform.position, _inputService.MousePosition(), Color.blue, 4f);
             if (_raycastService.PhysicsRaycast(ray, out var raycastHit, _defaultLayerMask))
             {
                 foreach (var windowBase in SelectedWindowsList)
                 {
+                    Debug.DrawRay(_camera.transform.position, mousePos - _camera.transform.position,
+                        Color.magenta, 2);
+                    
                     var windowIcon = (WindowIcon) windowBase;
+                    
+                    /*if (!InTerrainBounds(windowIcon.transform.position) || !InTerrainBounds(raycastHit.point))
+                    {
+                        break;
+                    }    */    
+                    
                     if (!_windowIdToMousePosition.ContainsKey(windowIcon.WindowIconId))
-                        continue;
+                        break;
 
-                    windowBase.transform.position =
-                        raycastHit.point - _windowIdToMousePosition[windowIcon.WindowIconId];
+                    Vector3 newPosition = raycastHit.point - _windowIdToMousePosition[windowIcon.WindowIconId];
+                    
+                    if (!InTerrainBounds(newPosition))
+                    {
+                        break;
+                    }  
+                    
+                    windowIcon.transform.position = newPosition;
 
                     _camera.DisablePanning();
                 }    
