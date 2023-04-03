@@ -9,6 +9,7 @@ namespace Ui.Elements
     {
         public Button Button;
         public WindowId WindowId;
+
         private IWindowService _windowService;
 
         private void Awake()

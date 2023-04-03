@@ -47,10 +47,10 @@ public sealed class AllServices : MonoBehaviour
         _factory = new GameFactory(_assets, _windowService, _uiFactory, _random, _raycastService, _inputService,
             _staticData, _animationService);
 
-        _windowSelectionVisualService = new WindowSelectionVisualService(_inputService, rectTransform);
+        _windowSelectionVisualService = new WindowSelectionVisualService(_inputService, rectTransform, _staticData);
         _windowSelectionService = new WindowSelectionService(_inputService, _factory, _windowSelectionVisualService,
             _raycastService, _staticData);
-        _windowPlacingService = new WindowPlacingService(_inputService, _factory, _raycastService);
+        _windowPlacingService = new WindowPlacingService(_inputService, _factory, _raycastService, _staticData);
         _windowEditingService = new WindowEditingService(_inputService, _windowPlacingService, _windowSelectionService,
             _windowService, _raycastService, _staticData);
 

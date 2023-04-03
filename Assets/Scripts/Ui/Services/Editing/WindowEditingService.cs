@@ -12,6 +12,8 @@ namespace Ui.Services.Editing
 {
     internal class WindowEditingService : IWindowEditingService
     {
+        private readonly KeyCode _deleteKey;
+
         private readonly IInputService _inputService;
         private readonly IRaycastService _raycastService;
         private readonly IStaticDataService _staticData;
@@ -21,7 +23,8 @@ namespace Ui.Services.Editing
         private readonly IWindowService _windowService;
 
         private IconEditMenu _currentEditingWindow;
-        public KeyCode deleteButton;
+        private readonly KeyCode _mouseEditKey;
+
 
         public WindowEditingService(IInputService inputService, IWindowPlacingService windowPlacingService,
             IWindowSelectionService windowSelectionService, IWindowService windowService,
@@ -37,7 +40,8 @@ namespace Ui.Services.Editing
             _windowSelectionService.OnDeselectAll += DeleteEditingMenu;
 
             var controlsStaticData = _staticData.ForControls();
-            deleteButton = controlsStaticData.DeleteIconsButton;
+            _deleteKey = controlsStaticData.DeleteIconsKey;
+            _mouseEditKey = controlsStaticData.MouseEditKey;
 
             CurrentEditingWindowIconsList = new List<WindowBase>();
 
@@ -47,10 +51,20 @@ namespace Ui.Services.Editing
 
         public List<WindowBase> CurrentEditingWindowIconsList { get; set; }
 
-        public void Edit()
+        public void DeleteSelectedWindowsIcons()
+        {
+            CurrentEditingWindowIconsList = _windowSelectionService.SelectedWindowsList;
+            foreach (WindowIcon windowIcon in CurrentEditingWindowIconsList)
+                if (windowIcon != null)
+                    windowIcon.Close();
+
+            DeleteEditingMenu();
+        }
+
+        private void Edit()
         {
             if (!_windowPlacingService.IsPlacing)
-                if (_inputService.LeftMouseDown())
+                if (_inputService.GetKeyDown(_mouseEditKey))
                 {
                     var hit = _raycastService.RaycastAll(_inputService.MousePosition());
 
@@ -65,19 +79,9 @@ namespace Ui.Services.Editing
                 }
         }
 
-        public void DeleteSelectedWindowsIcons()
-        {
-            CurrentEditingWindowIconsList = _windowSelectionService.SelectedWindowsList;
-            foreach (WindowIcon windowIcon in CurrentEditingWindowIconsList)
-                if (windowIcon != null)
-                    windowIcon.Close();
-
-            DeleteEditingMenu();
-        }
-
         private void DeleteIcons(KeyCode code)
         {
-            if (code == deleteButton) DeleteSelectedWindowsIcons();
+            if (code == _deleteKey) DeleteSelectedWindowsIcons();
         }
 
         private void DeleteEditingMenu()
@@ -89,9 +93,7 @@ namespace Ui.Services.Editing
         {
             if (hit == null) return false;
 
-            if (hit.GetComponentInParent<WindowIcon>() == null) return false;
-
-            return true;
+            return hit.GetComponentInParent<WindowIcon>() != null;
         }
     }
 }

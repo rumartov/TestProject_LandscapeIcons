@@ -1,4 +1,5 @@
 using Services.Input;
+using Services.StaticData;
 using UnityEngine;
 
 namespace Ui.Services.Selection
@@ -7,17 +8,24 @@ namespace Ui.Services.Selection
     {
         private readonly UnityEngine.Camera _camera;
         private readonly IInputService _inputService;
-        private Vector2 _boxCenter;
+        private readonly IStaticDataService _staticData;
 
+        private Vector2 _boxCenter;
         private Vector2 _endPosition;
         private Vector2 _extents;
+        private KeyCode _keyboardSelectionKey;
+        private KeyCode _mouseSelectionKey;
+
+        private Rect _selectionBox;
         private Vector2 _startPosition;
-        public Rect SelectionBox;
 
-
-        public WindowSelectionVisualService(IInputService inputService, RectTransform rectTransform)
+        public WindowSelectionVisualService(IInputService inputService, RectTransform rectTransform,
+            IStaticDataService staticData)
         {
             _inputService = inputService;
+            _staticData = staticData;
+
+            InitializeControls();
 
             _startPosition = Vector2.zero;
             _endPosition = Vector2.zero;
@@ -30,11 +38,18 @@ namespace Ui.Services.Selection
             _inputService.OnMouseUp += MouseUp;
         }
 
-        public RectTransform BoxVisual { get; set; }
+        public RectTransform BoxVisual { get; }
 
-        public bool UnitIsInSelectionBox(Vector2 position, Bounds bounds)
+        public bool UnitIsInSelectionBox(Vector2 position)
         {
-            return SelectionBox.Contains(position);
+            return _selectionBox.Contains(position);
+        }
+
+        private void InitializeControls()
+        {
+            var controlsStaticData = _staticData.ForControls();
+            _mouseSelectionKey = controlsStaticData.MouseSelectionKey;
+            _keyboardSelectionKey = controlsStaticData.KeyboardSelectionKey;
         }
 
         private void MouseClick()
@@ -65,8 +80,8 @@ namespace Ui.Services.Selection
 
         private bool ControlsPressed()
         {
-            //TODO update controls from static data
-            return _inputService.GetKey(KeyCode.Mouse0) && _inputService.GetKey(KeyCode.LeftControl);
+            return _inputService.GetKey(_mouseSelectionKey)
+                   && _inputService.GetKey(_keyboardSelectionKey);
         }
 
         private void StartSelecting()
@@ -74,7 +89,7 @@ namespace Ui.Services.Selection
             if (_startPosition == Vector2.zero)
             {
                 _startPosition = _inputService.MousePosition();
-                SelectionBox = new Rect();
+                _selectionBox = new Rect();
             }
         }
 
@@ -95,8 +110,8 @@ namespace Ui.Services.Selection
 
         private void DrawSelection()
         {
-            SelectionBox.min = _boxCenter - _extents;
-            SelectionBox.max = _boxCenter + _extents;
+            _selectionBox.min = _boxCenter - _extents;
+            _selectionBox.max = _boxCenter + _extents;
         }
     }
 }

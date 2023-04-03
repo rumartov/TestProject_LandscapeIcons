@@ -25,9 +25,12 @@ namespace Ui.Services.Selection
 
         private readonly TerrainStaticData _terrain;
         private readonly IWindowSelectionVisualService _windowSelectionVisualService;
+        private bool _isMovingSelected;
+        private KeyCode _keyboardSelectionKey;
+        private KeyCode _mouseSelectionKey;
 
         private Dictionary<int, Vector3> _windowIdToMousePosition;
-        private bool _isMovingSelected;
+
 
         public WindowSelectionService(IInputService inputService, IGameFactory factory,
             IWindowSelectionVisualService windowSelectionVisualService, IRaycastService raycastService,
@@ -46,19 +49,28 @@ namespace Ui.Services.Selection
 
             _defaultLayerMask = LayerMask.NameToLayer("MovableWindow");
 
+            InitializeControls();
+
             _camera = UnityEngine.Camera.main;
             _isMovingSelected = false;
-            
+
             _inputService.OnMouseClick += OnClick;
             _inputService.OnMouseHold += OnHold;
         }
 
-        public List<WindowBase> SelectedWindowsList { get; set; }
         public Action OnDeselectAll { get; set; }
+        public List<WindowBase> SelectedWindowsList { get; set; }
+
+        private void InitializeControls()
+        {
+            var controlsStaticData = _staticData.ForControls();
+            _mouseSelectionKey = controlsStaticData.MouseSelectionKey;
+            _keyboardSelectionKey = controlsStaticData.KeyboardSelectionKey;
+        }
 
         public void OnClick()
         {
-            if (_inputService.GetKeyDown(KeyCode.Mouse0))
+            if (_inputService.GetKeyDown(_mouseSelectionKey))
             {
                 WindowIconSelection();
 
@@ -75,14 +87,15 @@ namespace Ui.Services.Selection
             if (SelectedWindowsList.Contains(window))
                 return;
 
-            if (SelectedWindowsList.Count > 0 && !_isMovingSelected)
-            {
-                DeselectAll();
-            }
-            
-            SelectedWindowsList.Add(window);
+            if (IsSingleIconMoving()) DeselectAll();
 
+            SelectedWindowsList.Add(window);
             window.Highlight();
+        }
+
+        private bool IsSingleIconMoving()
+        {
+            return SelectedWindowsList.Count > 0 && !_isMovingSelected;
         }
 
         public void Deselect(WindowBase window)
@@ -119,7 +132,7 @@ namespace Ui.Services.Selection
 
                 Debug.DrawRay(iconPosition, worldToScreenPoint);
 
-                if (_windowSelectionVisualService.UnitIsInSelectionBox(worldToScreenPoint, bounds))
+                if (_windowSelectionVisualService.UnitIsInSelectionBox(worldToScreenPoint))
                     Select(windowIcon);
                 else
                     Deselect(windowIcon);
@@ -135,11 +148,11 @@ namespace Ui.Services.Selection
 
         private void AddWindowIconsClickPosition()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (_inputService.GetKeyDown(_mouseSelectionKey))
             {
                 var ray = _camera.ScreenPointToRay(_inputService.MousePosition());
 
-                if (Physics.Raycast(ray, out var raycastHit, 100, _defaultLayerMask))
+                if (_raycastService.PhysicsRaycast(ray, out var raycastHit, 100, _defaultLayerMask))
 
                     foreach (var windowBase in SelectedWindowsList)
                     {
@@ -169,20 +182,26 @@ namespace Ui.Services.Selection
         private void WindowIconSelection()
         {
             var hit = _raycastService.RaycastAll(_inputService.MousePosition());
-            if (hit != null)
-            {
-                if (UiClicked(hit))
-                    return;
 
-                var window = hit.gameObject.GetComponentInParent<WindowIcon>();
-                if (window == null) DeselectAll();
+            if (HitIsNull(hit)) return;
 
-                Select(window);
-            }
-            else
+            if (UiClicked(hit)) return;
+
+            var window = hit.gameObject.GetComponentInParent<WindowIcon>();
+            if (window == null) DeselectAll();
+
+            Select(window);
+        }
+
+        private bool HitIsNull(GameObject hit)
+        {
+            if (hit == null)
             {
                 DeselectAll();
+                return true;
             }
+
+            return false;
         }
 
         private bool UiClicked(GameObject data)
@@ -197,23 +216,20 @@ namespace Ui.Services.Selection
                 _isMovingSelected = true;
                 MultipleSelect();
             }
-            
-            if (!IsSelectingMultipleIcons())
-            {
-                _isMovingSelected = false;
-            }
+
+            if (!IsSelectingMultipleIcons()) _isMovingSelected = false;
 
             if (IsMovingSelected()) MoveSelected();
         }
 
         private bool IsMovingSelected()
         {
-            return _inputService.GetKey(KeyCode.Mouse0) && !_inputService.GetKey(KeyCode.LeftControl);
+            return _inputService.GetKey(_mouseSelectionKey) && !_inputService.GetKey(_keyboardSelectionKey);
         }
 
         private bool IsSelectingMultipleIcons()
         {
-            return _inputService.GetKey(KeyCode.Mouse0) && _inputService.GetKey(KeyCode.LeftControl);
+            return _inputService.GetKey(_mouseSelectionKey) && _inputService.GetKey(_keyboardSelectionKey);
         }
 
         private void MoveSelected()

@@ -5,8 +5,7 @@ namespace Ui.Services.Editing
 {
     public interface IWindowEditingService
     {
-        List<WindowBase> CurrentEditingWindowIconsList { get; set; }
-        public void Edit();
+        List<WindowBase> CurrentEditingWindowIconsList { get; }
         void DeleteSelectedWindowsIcons();
     }
 }

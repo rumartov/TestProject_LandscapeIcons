@@ -24,6 +24,11 @@ namespace Services.Raycast
             return Physics.Raycast(ray, out hit, 100000f, layerMask);
         }
 
+        public bool PhysicsRaycast(Ray ray, out RaycastHit hit, float maxDistance, int layerMask)
+        {
+            return Physics.Raycast(ray, out hit, maxDistance, layerMask);
+        }
+
         public bool PhysicsRaycast(Ray ray, out RaycastHit hit)
         {
             return Physics.Raycast(ray, out hit);

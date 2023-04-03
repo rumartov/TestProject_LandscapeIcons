@@ -13,7 +13,6 @@ namespace Ui.Factory
         private readonly IAnimationService _animationService;
         private readonly AssetProvider _assete;
         private readonly IAssetProvider _assets;
-        private readonly IInputService _inputService;
 
         private IWindowEditingService _windowEditingService;
         private IWindowPlacingService _windowPlacingService;
@@ -21,18 +20,11 @@ namespace Ui.Factory
         public UiFactory(AssetProvider assets, IInputService inputService, IAnimationService animationService)
         {
             _assets = assets;
-            _inputService = inputService;
             _animationService = animationService;
         }
 
         public IconEditMenu IconEditMenu { get; set; }
         public Transform UiRoot { get; set; }
-
-        public void CreateUiRoot()
-        {
-            var root = _assets.Instantiate(AssetPath.UiRoot);
-            UiRoot = root.GetComponent<UiRoot>().content.transform;
-        }
 
         public GameObject CreateIconsCreationMenu()
         {
@@ -53,6 +45,12 @@ namespace Ui.Factory
             IconEditMenu = editMenu;
 
             return iconEditMenu;
+        }
+
+        public void CreateUiRoot()
+        {
+            var root = _assets.Instantiate(AssetPath.UiRoot);
+            UiRoot = root.GetComponent<UiRoot>().content.transform;
         }
 
         public void InjectWindowServices(IWindowPlacingService windowPlacingService,

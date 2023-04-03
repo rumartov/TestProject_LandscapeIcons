@@ -11,9 +11,9 @@ namespace Ui.Window.Infrastructure
     {
         [SerializeField] private Button closeButton;
         [SerializeField] private Image image;
+        private readonly float _duration = 0.5f;
 
         private IAnimationService _animationService;
-        private readonly float _duration = 0.5f;
 
         private void Awake()
         {
