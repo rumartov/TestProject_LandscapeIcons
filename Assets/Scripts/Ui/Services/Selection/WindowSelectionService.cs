@@ -27,6 +27,7 @@ namespace Ui.Services.Selection
         private readonly IWindowSelectionVisualService _windowSelectionVisualService;
 
         private Dictionary<int, Vector3> _windowIdToMousePosition;
+        private bool _isMovingSelected;
 
         public WindowSelectionService(IInputService inputService, IGameFactory factory,
             IWindowSelectionVisualService windowSelectionVisualService, IRaycastService raycastService,
@@ -46,7 +47,8 @@ namespace Ui.Services.Selection
             _defaultLayerMask = LayerMask.NameToLayer("MovableWindow");
 
             _camera = UnityEngine.Camera.main;
-
+            _isMovingSelected = false;
+            
             _inputService.OnMouseClick += OnClick;
             _inputService.OnMouseHold += OnHold;
         }
@@ -73,6 +75,11 @@ namespace Ui.Services.Selection
             if (SelectedWindowsList.Contains(window))
                 return;
 
+            if (SelectedWindowsList.Count > 0 && !_isMovingSelected)
+            {
+                DeselectAll();
+            }
+            
             SelectedWindowsList.Add(window);
 
             window.Highlight();
@@ -178,16 +185,35 @@ namespace Ui.Services.Selection
             }
         }
 
-        private static bool UiClicked(GameObject data)
+        private bool UiClicked(GameObject data)
         {
             return data.layer == LayerMask.NameToLayer("UI");
         }
 
         public void OnHold()
         {
-            if (_inputService.LeftMouseHold() && _inputService.GetKey(KeyCode.LeftControl)) MultipleSelect();
+            if (IsSelectingMultipleIcons())
+            {
+                _isMovingSelected = true;
+                MultipleSelect();
+            }
+            
+            if (!IsSelectingMultipleIcons())
+            {
+                _isMovingSelected = false;
+            }
 
-            if (_inputService.LeftMouseHold() && !_inputService.GetKey(KeyCode.LeftControl)) MoveSelected();
+            if (IsMovingSelected()) MoveSelected();
+        }
+
+        private bool IsMovingSelected()
+        {
+            return _inputService.GetKey(KeyCode.Mouse0) && !_inputService.GetKey(KeyCode.LeftControl);
+        }
+
+        private bool IsSelectingMultipleIcons()
+        {
+            return _inputService.GetKey(KeyCode.Mouse0) && _inputService.GetKey(KeyCode.LeftControl);
         }
 
         private void MoveSelected()
