@@ -1,16 +1,17 @@
 using System.Collections.Generic;
-using DefaultNamespace;
-using Services;
+using Services.Input;
+using Services.Raycast;
+using Services.StaticData;
+using Ui.Services.Placing;
+using Ui.Services.Selection;
 using Ui.Window;
+using Ui.Window.Infrastructure;
 using UnityEngine;
 
-namespace Ui.Services
+namespace Ui.Services.Editing
 {
     internal class WindowEditingService : IWindowEditingService
     {
-        public KeyCode deleteButton;
-        public List<WindowBase> CurrentEditingWindowIconsList { get; set; }
-
         private readonly IInputService _inputService;
         private readonly IRaycastService _raycastService;
         private readonly IStaticDataService _staticData;
@@ -20,9 +21,10 @@ namespace Ui.Services
         private readonly IWindowService _windowService;
 
         private IconEditMenu _currentEditingWindow;
+        public KeyCode deleteButton;
 
         public WindowEditingService(IInputService inputService, IWindowPlacingService windowPlacingService,
-            IWindowSelectionService windowSelectionService, IWindowService windowService, 
+            IWindowSelectionService windowSelectionService, IWindowService windowService,
             IRaycastService raycastService, IStaticDataService staticData)
         {
             _inputService = inputService;
@@ -33,24 +35,17 @@ namespace Ui.Services
             _staticData = staticData;
 
             _windowSelectionService.OnDeselectAll += DeleteEditingMenu;
-            
-            ControlsStaticData controlsStaticData = _staticData.ForControls();
+
+            var controlsStaticData = _staticData.ForControls();
             deleteButton = controlsStaticData.DeleteIconsButton;
-            
+
             CurrentEditingWindowIconsList = new List<WindowBase>();
 
             _inputService.OnMouseClick += Edit;
-            
-            _inputService.OnKeyDown += DeleteIcons; 
+            _inputService.OnKeyDown += DeleteIcons;
         }
 
-        private void DeleteIcons(KeyCode code)
-        {
-            if (code == deleteButton)
-            {
-                DeleteSelectedWindowsIcons();
-            }
-        }
+        public List<WindowBase> CurrentEditingWindowIconsList { get; set; }
 
         public void Edit()
         {
@@ -72,15 +67,22 @@ namespace Ui.Services
 
         public void DeleteSelectedWindowsIcons()
         {
+            CurrentEditingWindowIconsList = _windowSelectionService.SelectedWindowsList;
             foreach (WindowIcon windowIcon in CurrentEditingWindowIconsList)
-                windowIcon.Close();
-            
+                if (windowIcon != null)
+                    windowIcon.Close();
+
             DeleteEditingMenu();
+        }
+
+        private void DeleteIcons(KeyCode code)
+        {
+            if (code == deleteButton) DeleteSelectedWindowsIcons();
         }
 
         private void DeleteEditingMenu()
         {
-            if(_currentEditingWindow != null) _currentEditingWindow.Close();
+            if (_currentEditingWindow != null) _currentEditingWindow.Close();
         }
 
         private bool HasWindowIcon(GameObject hit)

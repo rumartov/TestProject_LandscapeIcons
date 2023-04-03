@@ -2,7 +2,7 @@
 using Ui.Window;
 using UnityEngine;
 
-namespace Services
+namespace Services.Factory
 {
     public interface IGameFactory
     {

@@ -1,4 +1,4 @@
-namespace Ui.Window
+namespace Ui.Window.Infrastructure
 {
     public interface ISelectableWindow
     {

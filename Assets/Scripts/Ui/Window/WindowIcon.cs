@@ -1,5 +1,7 @@
 using System;
+using Services.Animation;
 using TMPro;
+using Ui.Window.Infrastructure;
 using UnityEngine;
 
 namespace Ui.Window
@@ -11,12 +13,12 @@ namespace Ui.Window
         [SerializeField] private TextMeshProUGUI tmpText;
         [SerializeField] private float maxScale = 0.5f;
         [SerializeField] private float minScale = 0.2f;
+        private IAnimationService _animationService;
 
         private Vector3 _baseLocalScale;
+        private Vector3 _defaultSize;
 
         private string _text;
-        private IAnimationService _animationService;
-        private Vector3 _defaultSize;
         public Action OnTextUpdate { get; set; }
 
         public string Text
@@ -40,7 +42,7 @@ namespace Ui.Window
         public void Construct(int windowIconId, IAnimationService animationService)
         {
             base.Construct(animationService);
-            
+
             WindowIconId = windowIconId;
             WindowId = WindowId.WindowIcon;
 
@@ -48,19 +50,19 @@ namespace Ui.Window
             OnTextUpdate += UpdateIcon;
 
             _animationService = animationService;
-            
+
             _animationService.ScaleUp(transform, duration);
         }
 
         private void UpdateIcon()
         {
-            float newScale = Text.Length / 2f;
+            var newScale = Text.Length / 2f;
 
             if (newScale <= 0)
                 return;
-            
-            ReScaleTarget(newScale); 
-            
+
+            ReScaleTarget(newScale);
+
             RaiseTarget(transform);
 
             tmpText.text = _text;
@@ -89,15 +91,15 @@ namespace Ui.Window
                 SetScaleToTarget(minScale, transform);
                 return;
             }
-            
+
             SetScaleToTarget(newScale * _baseLocalScale.x, transform);
         }
 
         private void SetScaleToTarget(float newScale, Transform target)
         {
-            float scaleX = newScale;
-            float scaleY = newScale;
-            float scaleZ = newScale;
+            var scaleX = newScale;
+            var scaleY = newScale;
+            var scaleZ = newScale;
             target.localScale = new Vector3(scaleX, scaleY, scaleZ);
         }
 

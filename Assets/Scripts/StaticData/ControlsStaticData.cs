@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace DefaultNamespace
+namespace StaticData
 {
     [CreateAssetMenu(fileName = "ControlsData", menuName = "Static Data/Controls")]
     public sealed class ControlsStaticData : ScriptableObject

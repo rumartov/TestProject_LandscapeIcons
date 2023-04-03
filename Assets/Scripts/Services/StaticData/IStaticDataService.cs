@@ -1,7 +1,6 @@
-﻿using DefaultNamespace.StaticData;
-using UnityEngine;
+﻿using StaticData;
 
-namespace DefaultNamespace
+namespace Services.StaticData
 {
     public interface IStaticDataService
     {

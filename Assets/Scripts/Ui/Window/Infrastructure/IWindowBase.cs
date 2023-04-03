@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Ui.Window
+﻿namespace Ui.Window.Infrastructure
 {
     public interface IWindowBase
     {

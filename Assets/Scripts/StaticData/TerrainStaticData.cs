@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace DefaultNamespace
+namespace StaticData
 {
     [CreateAssetMenu(fileName = "TerrainData", menuName = "Static Data/Terrain")]
     public sealed class TerrainStaticData : ScriptableObject

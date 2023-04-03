@@ -1,5 +1,8 @@
-﻿using Services;
-using Ui.Services;
+﻿using Services.Animation;
+using Services.AssetProvider;
+using Services.Input;
+using Ui.Services.Editing;
+using Ui.Services.Placing;
 using Ui.Window;
 using UnityEngine;
 
@@ -7,10 +10,10 @@ namespace Ui.Factory
 {
     public class UiFactory : IUiFactory
     {
+        private readonly IAnimationService _animationService;
         private readonly AssetProvider _assete;
         private readonly IAssetProvider _assets;
         private readonly IInputService _inputService;
-        private readonly IAnimationService _animationService;
 
         private IWindowEditingService _windowEditingService;
         private IWindowPlacingService _windowPlacingService;
@@ -41,10 +44,10 @@ namespace Ui.Factory
         public GameObject CreateEditIconMenu()
         {
             DestroyMenuIfExist();
-            
+
             var iconEditMenu = _assets.Instantiate(AssetPath.IconEditMenu, UiRoot);
 
-            IconEditMenu editMenu = iconEditMenu.GetComponent<IconEditMenu>();
+            var editMenu = iconEditMenu.GetComponent<IconEditMenu>();
             editMenu.Construct(_animationService, _windowEditingService);
 
             IconEditMenu = editMenu;
@@ -52,7 +55,7 @@ namespace Ui.Factory
             return iconEditMenu;
         }
 
-        public void InjectWindowServices(IWindowPlacingService windowPlacingService, 
+        public void InjectWindowServices(IWindowPlacingService windowPlacingService,
             IWindowEditingService windowEditingService)
         {
             _windowPlacingService = windowPlacingService;

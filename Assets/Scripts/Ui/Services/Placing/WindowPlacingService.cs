@@ -1,11 +1,14 @@
 using Services;
+using Services.Factory;
+using Services.Input;
+using Services.Raycast;
 using UnityEngine;
 
-namespace Ui.Services
+namespace Ui.Services.Placing
 {
     public class WindowPlacingService : IWindowPlacingService
     {
-        private readonly Camera _camera;
+        private readonly UnityEngine.Camera _camera;
         private readonly IGameFactory _factory;
         private readonly IInputService _inputService;
         private readonly IRaycastService _raycastService;
@@ -16,7 +19,7 @@ namespace Ui.Services
             _factory = factory;
             _raycastService = raycastService;
             _inputService = inputService;
-            _camera = Camera.main;
+            _camera = UnityEngine.Camera.main;
 
             IsPlacing = false;
 

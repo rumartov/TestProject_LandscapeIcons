@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Services.Input;
+using UnityEngine;
 
 namespace Services
 {

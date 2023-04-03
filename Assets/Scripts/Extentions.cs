@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using RTS_Cam;
-using UnityEngine;
 
 public static class Extensions
 {
@@ -11,12 +10,12 @@ public static class Extensions
         return listToClone.Select(item => (T) item.Clone()).ToList();
     }
 
-    public static void EnablePanning(this Camera camera)
+    public static void EnablePanning(this UnityEngine.Camera camera)
     {
         camera.GetComponent<RTS_Camera>().usePanning = true;
     }
 
-    public static void DisablePanning(this Camera camera)
+    public static void DisablePanning(this UnityEngine.Camera camera)
     {
         camera.GetComponent<RTS_Camera>().usePanning = false;
     }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Ui.Window;
+using Ui.Window.Infrastructure;
 
-namespace Ui.Services
+namespace Ui.Services.Selection
 {
     public interface IWindowSelectionService
     {
@@ -10,7 +10,7 @@ namespace Ui.Services
         public Action OnDeselectAll { get; set; }
         public void OnClick();
         public void Select(WindowBase window);
-        public void CtrlSelect();
+        public void MultipleSelect();
         public void DeselectAll();
         void Deselect(WindowBase window);
     }

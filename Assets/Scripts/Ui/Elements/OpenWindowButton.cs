@@ -1,9 +1,9 @@
 using Ui.Services;
-using Ui.Window;
+using Ui.Window.Infrastructure;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Ui.Elemets
+namespace Ui.Elements
 {
     public class OpenWindowButton : MonoBehaviour
     {

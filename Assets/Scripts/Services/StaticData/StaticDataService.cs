@@ -1,10 +1,10 @@
 ﻿using System.Linq;
-using DefaultNamespace.StaticData;
+using StaticData;
 using UnityEngine;
 
-namespace DefaultNamespace
+namespace Services.StaticData
 {
-    class StaticDataService : IStaticDataService
+    internal class StaticDataService : IStaticDataService
     {
         private const string CameraDataPath = "StaticData/Camera";
         private const string ControlsDataPath = "StaticData/Controls";
@@ -20,11 +20,11 @@ namespace DefaultNamespace
             _cameraStaticData = Resources
                 .LoadAll<CameraStaticData>(CameraDataPath)
                 .First();
-            
+
             _controlsStaticData = Resources
                 .LoadAll<ControlsStaticData>(ControlsDataPath)
                 .First();
-            
+
             _terrainStaticData = Resources
                 .LoadAll<TerrainStaticData>(TerrainDataPath)
                 .First();
@@ -39,7 +39,7 @@ namespace DefaultNamespace
         {
             return _controlsStaticData;
         }
-        
+
         public TerrainStaticData ForTerrain()
         {
             return _terrainStaticData;

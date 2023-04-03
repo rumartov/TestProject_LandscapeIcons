@@ -2,7 +2,7 @@
 using DG.Tweening.Plugins.Options;
 using UnityEngine;
 
-namespace Ui.Window
+namespace Services.Animation
 {
     public interface IAnimationService
     {

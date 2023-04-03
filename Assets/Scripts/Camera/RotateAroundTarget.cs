@@ -1,35 +1,26 @@
-﻿using DefaultNamespace.StaticData;
-using RTS_Cam;
-using Services;
+﻿using RTS_Cam;
+using Services.Input;
+using Services.Raycast;
 using UnityEngine;
 
-namespace DefaultNamespace
+namespace Camera
 {
     public sealed class RotateAroundTarget : MonoBehaviour
     {
         public float distanceToTarget;
         public KeyCode mouseRotationKey;
         public KeyCode keyboardRotationKey;
-        
-        private IRaycastService _raycastService;
-        private IInputService _inputService;
 
-        private Camera _camera;
+        private UnityEngine.Camera _camera;
+        private IInputService _inputService;
+        private Vector3 _previousPosition;
+
+        private IRaycastService _raycastService;
         private RTS_Camera _rtsCamera;
 
         private Vector3 _target;
-        private Vector3 _previousPosition;
 
-        public void Construct(IInputService inputService, IRaycastService raycastService)
-        {
-            _inputService = inputService;
-            _raycastService = raycastService;
-            
-            _camera = Camera.main;
-            _rtsCamera = _camera.GetComponent<RTS_Camera>();
-        }
-
-        void Update()
+        private void Update()
         {
             if (RotationControlsActive())
             {
@@ -39,12 +30,20 @@ namespace DefaultNamespace
 
             if (RotationControlsInActive())
             {
-                ResetTarget();   
+                ResetTarget();
                 _rtsCamera.enabled = true;
             }
-            
-            if(HasTarget()) RotateAround();
-            
+
+            if (HasTarget()) RotateAround();
+        }
+
+        public void Construct(IInputService inputService, IRaycastService raycastService)
+        {
+            _inputService = inputService;
+            _raycastService = raycastService;
+
+            _camera = UnityEngine.Camera.main;
+            _rtsCamera = _camera.GetComponent<RTS_Camera>();
         }
 
         private bool HasTarget()
@@ -67,11 +66,11 @@ namespace DefaultNamespace
             var cameraTransform = _camera.transform;
             var position = cameraTransform.position;
             var direction = cameraTransform.forward;
-            
+
             var ray = new Ray(position, direction);
-            
+
             Debug.DrawRay(position, direction, Color.blue, 4f);
-            
+
             if (_raycastService.PhysicsRaycast(ray, out var hit))
             {
                 Debug.Log(hit.point);
@@ -87,11 +86,11 @@ namespace DefaultNamespace
             }
             else if (_inputService.GetKey(mouseRotationKey))
             {
-                Vector3 newPosition = _camera.ScreenToViewportPoint(Input.mousePosition);
-                Vector3 direction = _previousPosition - newPosition;
+                var newPosition = _camera.ScreenToViewportPoint(Input.mousePosition);
+                var direction = _previousPosition - newPosition;
 
-                float rotationAroundYAxis = -direction.x * 180;
-                float rotationAroundXAxis = direction.y * 180;
+                var rotationAroundYAxis = -direction.x * 180;
+                var rotationAroundXAxis = direction.y * 180;
 
                 _camera.transform.position = _target;
 

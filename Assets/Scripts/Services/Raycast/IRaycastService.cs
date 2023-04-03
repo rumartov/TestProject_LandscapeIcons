@@ -1,7 +1,6 @@
-using System;
 using UnityEngine;
 
-namespace Services
+namespace Services.Raycast
 {
     public interface IRaycastService
     {

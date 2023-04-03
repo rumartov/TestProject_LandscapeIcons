@@ -1,4 +1,4 @@
-namespace Ui.Services
+namespace Ui.Services.Placing
 {
     public interface IWindowPlacingService
     {

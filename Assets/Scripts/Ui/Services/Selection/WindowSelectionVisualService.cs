@@ -1,20 +1,18 @@
-using Services;
+using Services.Input;
 using UnityEngine;
 
-namespace Ui.Services
+namespace Ui.Services.Selection
 {
     internal class WindowSelectionVisualService : IWindowSelectionVisualService
     {
+        private readonly UnityEngine.Camera _camera;
         private readonly IInputService _inputService;
-        public Rect SelectionBox;
-        
-        public RectTransform BoxVisual { get; set; }
-        private readonly Camera _camera;
+        private Vector2 _boxCenter;
 
         private Vector2 _endPosition;
-        private Vector2 _startPosition;
         private Vector2 _extents;
-        private Vector2 _boxCenter;
+        private Vector2 _startPosition;
+        public Rect SelectionBox;
 
 
         public WindowSelectionVisualService(IInputService inputService, RectTransform rectTransform)
@@ -23,7 +21,7 @@ namespace Ui.Services
 
             _startPosition = Vector2.zero;
             _endPosition = Vector2.zero;
-            _camera = Camera.main;
+            _camera = UnityEngine.Camera.main;
 
             BoxVisual = rectTransform;
 
@@ -32,17 +30,16 @@ namespace Ui.Services
             _inputService.OnMouseUp += MouseUp;
         }
 
+        public RectTransform BoxVisual { get; set; }
+
         public bool UnitIsInSelectionBox(Vector2 position, Bounds bounds)
         {
             return SelectionBox.Contains(position);
         }
-            
+
         private void MouseClick()
         {
-            if (ControlsPressed())
-            {
-                StartSelecting();
-            }
+            if (ControlsPressed()) StartSelecting();
         }
 
         private void MouseUp()
@@ -69,7 +66,7 @@ namespace Ui.Services
         private bool ControlsPressed()
         {
             //TODO update controls from static data
-            return _inputService.LeftMouseHold() && _inputService.LeftCtrl();
+            return _inputService.GetKey(KeyCode.Mouse0) && _inputService.GetKey(KeyCode.LeftControl);
         }
 
         private void StartSelecting()
@@ -84,23 +81,22 @@ namespace Ui.Services
         private void DrawVisual()
         {
             _boxCenter = (_startPosition + _endPosition) / 2;
-            
+
             BoxVisual.position = _boxCenter;
 
             var boxSize = new Vector2(
-                Mathf.Abs(_startPosition.x - _endPosition.x), 
+                Mathf.Abs(_startPosition.x - _endPosition.x),
                 Mathf.Abs(_startPosition.y - _endPosition.y));
 
             BoxVisual.sizeDelta = boxSize;
-            
+
             _extents = boxSize / 2.0f;
-        }   
-        
+        }
+
         private void DrawSelection()
         {
             SelectionBox.min = _boxCenter - _extents;
             SelectionBox.max = _boxCenter + _extents;
         }
-        
     }
 }

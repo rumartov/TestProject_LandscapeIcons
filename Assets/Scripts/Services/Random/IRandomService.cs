@@ -1,4 +1,4 @@
-namespace Services
+namespace Services.Random
 {
     internal interface IRandomService
     {

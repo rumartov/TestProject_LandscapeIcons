@@ -1,43 +1,19 @@
 ﻿using System;
 using System.Collections;
 using DG.Tweening;
-using Unity.VisualScripting;
+using Services.Animation;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Ui.Window
+namespace Ui.Window.Infrastructure
 {
     public abstract class WindowBase : MonoBehaviour, IWindowBase
     {
         [SerializeField] private Button closeButton;
         [SerializeField] private Image image;
-        
-        private IAnimationService _animationService;
-        float _duration = 0.5f;
-        
-        public void Construct(IAnimationService animationService)
-        {
-            _animationService = animationService;
-        }
-        public virtual void Close()
-        {
-            StartCoroutine(PreDestroy(() => Destroy(gameObject)));
-        }
 
-        private IEnumerator PreDestroy(Action onClosed)
-        {
-            bool completed = false;
-            
-            _animationService
-                .ScaleDown(transform, _duration)
-                .OnComplete(() => completed = true);
-            
-            while (!completed)
-                yield return null;
-            
-            Debug.Log("Completed animation");
-            onClosed.Invoke();
-        }
+        private IAnimationService _animationService;
+        private readonly float _duration = 0.5f;
 
         private void Awake()
         {
@@ -45,8 +21,13 @@ namespace Ui.Window
         }
 
         private void OnDestroy()
-        { 
+        {
             Cleanup();
+        }
+
+        public virtual void Close()
+        {
+            StartCoroutine(PreDestroy(() => Destroy(gameObject)));
         }
 
         public void Highlight()
@@ -64,6 +45,27 @@ namespace Ui.Window
             Debug.Log("UnHighlight");
             image.color = Color.white;
         }
+
+        public void Construct(IAnimationService animationService)
+        {
+            _animationService = animationService;
+        }
+
+        private IEnumerator PreDestroy(Action onClosed)
+        {
+            var completed = false;
+
+            _animationService
+                .ScaleDown(transform, _duration)
+                .OnComplete(() => completed = true);
+
+            while (!completed)
+                yield return null;
+
+            Debug.Log("Completed animation");
+            onClosed.Invoke();
+        }
+
         private void OnAwake()
         {
             closeButton?.onClick.AddListener(Close);

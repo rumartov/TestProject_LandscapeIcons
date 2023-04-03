@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Ui.Services
+namespace Ui.Services.Selection
 {
     public interface IWindowSelectionVisualService
     {

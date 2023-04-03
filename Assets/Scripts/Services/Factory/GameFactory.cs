@@ -1,30 +1,35 @@
 using System.Collections.Generic;
-using DefaultNamespace;
-using DefaultNamespace.StaticData;
+using Camera;
 using RTS_Cam;
-using Ui.Elemets;
+using Services.Animation;
+using Services.Input;
+using Services.Random;
+using Services.Raycast;
+using Services.StaticData;
+using Ui.Elements;
 using Ui.Factory;
 using Ui.Services;
+using Ui.Services.Selection;
 using Ui.Window;
 using UnityComponents;
 using UnityEngine;
 
-namespace Services
+namespace Services.Factory
 {
     internal class GameFactory : IGameFactory
     {
-        private readonly AssetProvider _assets;
+        private readonly IAnimationService _animationService;
+        private readonly AssetProvider.AssetProvider _assets;
         private readonly IInputService _inputService;
         private readonly IRandomService _random;
         private readonly IRaycastService _raycastService;
+        private readonly IStaticDataService _staticData;
         private readonly UiFactory _uiFactory;
         private readonly IWindowService _windowService;
-        private readonly IStaticDataService _staticData;
-        private readonly IAnimationService _animationService;
 
         private IWindowSelectionService _selectionWindowService;
 
-        public GameFactory(AssetProvider assets, IWindowService windowService, UiFactory uiFactory,
+        public GameFactory(AssetProvider.AssetProvider assets, IWindowService windowService, UiFactory uiFactory,
             IRandomService random, IRaycastService raycastService, IInputService inputService,
             IStaticDataService staticData, IAnimationService animationService)
         {
@@ -73,6 +78,24 @@ namespace Services
             return windowIcon;
         }
 
+        public void CreateCamera()
+        {
+            var camera = UnityEngine.Camera.main;
+
+            var cameraStaticData = _staticData.ForCamera();
+
+            var rtsCamera = camera.GetComponent<RTS_Camera>();
+            rtsCamera.panningKey = cameraStaticData.PanningKey;
+            rtsCamera.panningSpeed = cameraStaticData.PanningSpeed;
+
+            var rotateAroundTarget = camera.GetComponent<RotateAroundTarget>();
+            rotateAroundTarget.distanceToTarget = cameraStaticData.DistanceToTargetOnRotation;
+            rotateAroundTarget.keyboardRotationKey = cameraStaticData.KeyboardRotationKey;
+            rotateAroundTarget.mouseRotationKey = cameraStaticData.MouseRotationKey;
+
+            rotateAroundTarget.Construct(_inputService, _raycastService);
+        }
+
         private void DestroyIconCreationMenu()
         {
             _uiFactory.UiRoot.GetComponentInChildren<IconCreationMenu>().Close();
@@ -89,24 +112,6 @@ namespace Services
             }
 
             return list;
-        }
-        
-        public void CreateCamera()
-        {
-            Camera camera = Camera.main;
-
-            CameraStaticData cameraStaticData = _staticData.ForCamera();
-            
-            RTS_Camera rtsCamera = camera.GetComponent<RTS_Camera>();
-            rtsCamera.panningKey = cameraStaticData.PanningKey;
-            rtsCamera.panningSpeed = cameraStaticData.PanningSpeed;
-            
-            RotateAroundTarget rotateAroundTarget = camera.GetComponent<RotateAroundTarget>();
-            rotateAroundTarget.distanceToTarget = cameraStaticData.DistanceToTargetOnRotation;
-            rotateAroundTarget.keyboardRotationKey = cameraStaticData.KeyboardRotationKey;
-            rotateAroundTarget.mouseRotationKey = cameraStaticData.MouseRotationKey;
-            
-            rotateAroundTarget.Construct(_inputService, _raycastService);
         }
     }
 }

@@ -1,5 +1,5 @@
 using Ui.Factory;
-using Ui.Window;
+using Ui.Window.Infrastructure;
 using UnityEngine;
 
 namespace Ui.Services

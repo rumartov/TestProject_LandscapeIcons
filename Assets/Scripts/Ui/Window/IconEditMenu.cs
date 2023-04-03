@@ -1,7 +1,9 @@
-using DefaultNamespace;
-using DG.Tweening;
+using System.Linq;
+using Services.Animation;
+using Services.StaticData;
 using TMPro;
-using Ui.Services;
+using Ui.Services.Editing;
+using Ui.Window.Infrastructure;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,20 +13,28 @@ namespace Ui.Window
     {
         [SerializeField] private TMP_InputField inputField;
         [SerializeField] private Button deleteWindowIconsButton;
-        private IWindowEditingService _windowEditingService;
+        [SerializeField] private Button submitTextButton;
 
         private IStaticDataService _staticData;
-        
+
+        private IWindowEditingService _windowEditingService;
+
         public void Construct(IAnimationService animationService, IWindowEditingService windowEditingService)
         {
             base.Construct(animationService);
-            
+
             _windowEditingService = windowEditingService;
 
-            inputField.onSubmit.AddListener(UpdateWindowIconsText);
+            var windowIcon = windowEditingService.CurrentEditingWindowIconsList
+                .First()
+                .GetComponent<WindowIcon>();
+
+            inputField.text = windowIcon.Text;
+
             deleteWindowIconsButton.onClick.AddListener(DeleteSelectedWindowsIcons);
+            submitTextButton.onClick.AddListener(() => UpdateWindowIconsText(inputField.text));
         }
-        
+
         private void DeleteSelectedWindowsIcons()
         {
             _windowEditingService.DeleteSelectedWindowsIcons();

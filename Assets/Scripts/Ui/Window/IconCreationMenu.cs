@@ -1,5 +1,6 @@
-﻿using System.Collections;
-using Ui.Services;
+﻿using Services.Animation;
+using Ui.Services.Placing;
+using Ui.Window.Infrastructure;
 
 namespace Ui.Window
 {
@@ -10,11 +11,11 @@ namespace Ui.Window
         public void Construct(IAnimationService animationService, IWindowPlacingService windowPlacingService)
         {
             base.Construct(animationService);
-            
+
             _windowPlacingService = windowPlacingService;
             _windowPlacingService.IsPlacing = true;
         }
-        
+
         protected override void Cleanup()
         {
             base.Cleanup();

@@ -1,9 +1,8 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace Services
+namespace Services.Raycast
 {
     internal class RaycastService : IRaycastService
     {
@@ -19,10 +18,10 @@ namespace Services
 
             return null;
         }
-        
+
         public bool PhysicsRaycast(Ray ray, out RaycastHit hit, int layerMask)
         {
-            return Physics.Raycast(ray, out hit, 100000f,layerMask);
+            return Physics.Raycast(ray, out hit, 100000f, layerMask);
         }
 
         public bool PhysicsRaycast(Ray ray, out RaycastHit hit)
