@@ -6,13 +6,18 @@ namespace Ui.Services
     internal class WindowSelectionVisualService : IWindowSelectionVisualService
     {
         private readonly IInputService _inputService;
+        public Rect SelectionBox;
+        
+        public RectTransform BoxVisual { get; set; }
         private readonly Camera _camera;
-        private Vector3 _endPosition;
 
-        private Vector3 _startPosition;
+        private Vector2 _endPosition;
+        private Vector2 _startPosition;
+        private Vector2 _extents;
+        private Vector2 _boxCenter;
 
-        public WindowSelectionVisualService(IInputService inputService,
-            RectTransform rectTransform)
+
+        public WindowSelectionVisualService(IInputService inputService, RectTransform rectTransform)
         {
             _inputService = inputService;
 
@@ -23,21 +28,21 @@ namespace Ui.Services
             BoxVisual = rectTransform;
 
             _inputService.OnMouseClick += MouseClick;
-            _inputService.OnMouseHold += MouseHeld;
+            _inputService.OnMouseHold += MouseHold;
             _inputService.OnMouseUp += MouseUp;
         }
 
-        public RectTransform BoxVisual { get; set; }
-
         public bool UnitIsInSelectionBox(Vector2 position, Bounds bounds)
         {
-            return position.x > bounds.min.x && position.x < bounds.max.x
-                                             && position.y > bounds.min.y && position.y < bounds.max.y;
+            return SelectionBox.Contains(position);
         }
-
+            
         private void MouseClick()
         {
-            if (ControlsPressed()) StartSelecting();
+            if (ControlsPressed())
+            {
+                StartSelecting();
+            }
         }
 
         private void MouseUp()
@@ -49,7 +54,7 @@ namespace Ui.Services
             DrawVisual();
         }
 
-        private void MouseHeld()
+        private void MouseHold()
         {
             if (ControlsPressed())
             {
@@ -57,34 +62,45 @@ namespace Ui.Services
                 _camera.DisablePanning();
             }
 
+            DrawSelection();
             DrawVisual();
         }
 
         private bool ControlsPressed()
         {
+            //TODO update controls from static data
             return _inputService.LeftMouseHold() && _inputService.LeftCtrl();
         }
 
         private void StartSelecting()
         {
-            if (_startPosition == Vector3.zero)
+            if (_startPosition == Vector2.zero)
             {
                 _startPosition = _inputService.MousePosition();
-                new Rect();
+                SelectionBox = new Rect();
             }
         }
 
         private void DrawVisual()
         {
-            Vector2 boxStart = _startPosition;
-            Vector2 boxEnd = _endPosition;
+            _boxCenter = (_startPosition + _endPosition) / 2;
+            
+            BoxVisual.position = _boxCenter;
 
-            var boxCenter = (boxStart + boxEnd) / 2;
-            BoxVisual.position = boxCenter;
-
-            var boxSize = new Vector2(Mathf.Abs(boxStart.x - boxEnd.x), Mathf.Abs(boxStart.y - boxEnd.y));
+            var boxSize = new Vector2(
+                Mathf.Abs(_startPosition.x - _endPosition.x), 
+                Mathf.Abs(_startPosition.y - _endPosition.y));
 
             BoxVisual.sizeDelta = boxSize;
+            
+            _extents = boxSize / 2.0f;
+        }   
+        
+        private void DrawSelection()
+        {
+            SelectionBox.min = _boxCenter - _extents;
+            SelectionBox.max = _boxCenter + _extents;
         }
+        
     }
 }

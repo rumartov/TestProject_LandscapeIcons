@@ -9,11 +9,14 @@ namespace Ui.Window
         //TODO add animation static data
         [SerializeField] private float duration = 0.5f;
         [SerializeField] private TextMeshProUGUI tmpText;
+        [SerializeField] private float maxScale = 0.5f;
+        [SerializeField] private float minScale = 0.2f;
 
         private Vector3 _baseLocalScale;
 
         private string _text;
         private IAnimationService _animationService;
+        private Vector3 _defaultSize;
         public Action OnTextUpdate { get; set; }
 
         public string Text
@@ -51,20 +54,51 @@ namespace Ui.Window
 
         private void UpdateIcon()
         {
-            var newScale = Text.Length / 10;
+            float newScale = Text.Length / 2f;
 
-            if (newScale > 1)
-            {
-                var scaleX = _baseLocalScale.x * newScale;
-                var scaleY = _baseLocalScale.y * newScale;
-                var scaleZ = _baseLocalScale.z * newScale;
-                transform.localScale = new Vector3(scaleX, scaleY, scaleZ);
-            }
-
-            transform.position =
-                new Vector3(transform.position.x, _baseLocalScale.y + transform.position.y, transform.position.z);
+            if (newScale <= 0)
+                return;
+            
+            ReScaleTarget(newScale); 
+            
+            RaiseTarget(transform);
 
             tmpText.text = _text;
+        }
+
+        private void RaiseTarget(Transform target)
+        {
+            var position = target.position;
+            position = new Vector3(
+                transform.position.x,
+                _baseLocalScale.y + position.y,
+                position.z);
+            target.position = position;
+        }
+
+        private void ReScaleTarget(float newScale)
+        {
+            if (_baseLocalScale.x * newScale > maxScale)
+            {
+                SetScaleToTarget(maxScale, transform);
+                return;
+            }
+
+            if (_baseLocalScale.x * newScale < minScale)
+            {
+                SetScaleToTarget(minScale, transform);
+                return;
+            }
+            
+            SetScaleToTarget(newScale * _baseLocalScale.x, transform);
+        }
+
+        private void SetScaleToTarget(float newScale, Transform target)
+        {
+            float scaleX = newScale;
+            float scaleY = newScale;
+            float scaleZ = newScale;
+            target.localScale = new Vector3(scaleX, scaleY, scaleZ);
         }
 
         protected override void Cleanup()

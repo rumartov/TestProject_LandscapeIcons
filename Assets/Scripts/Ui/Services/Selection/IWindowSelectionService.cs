@@ -12,5 +12,6 @@ namespace Ui.Services
         public void Select(WindowBase window);
         public void CtrlSelect();
         public void DeselectAll();
+        void Deselect(WindowBase window);
     }
 }

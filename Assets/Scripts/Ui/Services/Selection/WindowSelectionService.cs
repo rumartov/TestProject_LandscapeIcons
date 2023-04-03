@@ -4,6 +4,7 @@ using DefaultNamespace;
 using DG.Tweening;
 using Services;
 using Ui.Window;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Ui.Services
@@ -22,12 +23,10 @@ namespace Ui.Services
 
         private readonly int _defaultLayerMask;
         private readonly IWindowSelectionVisualService _windowSelectionVisualService;
-        private Vector3 _cachedMousePosition = Vector3.zero;
 
         private Dictionary<int, Vector3> _windowIdToMousePosition;
         public List<WindowBase> SelectedWindowsList { get; set; }
         public Action OnDeselectAll { get; set; }
-
 
         public WindowSelectionService(IInputService inputService, IGameFactory factory,
             IWindowSelectionVisualService windowSelectionVisualService, IRaycastService raycastService, 
@@ -71,14 +70,31 @@ namespace Ui.Services
             SelectedWindowsList.Add(window);
             window.Highlight();
         }
+        
+        public void Deselect(WindowBase window)
+        {
+            SelectedWindowsList.Remove(window);
+            window.UnHighlight();
+        }
 
         public void CtrlSelect()
         {
             var bounds = new Bounds(_windowSelectionVisualService.BoxVisual.anchoredPosition,
                 _windowSelectionVisualService.BoxVisual.sizeDelta);
+
             foreach (var windowIcon in _factory.WindowIconList)
-                if (_windowSelectionVisualService.UnitIsInSelectionBox(windowIcon.transform.position, bounds))
+            {
+                Vector3 iconPosition = windowIcon.transform.position;
+                
+                Vector2 worldToScreenPoint = _camera.WorldToScreenPoint(iconPosition);
+                
+                Debug.DrawRay(iconPosition, worldToScreenPoint);
+
+                if (_windowSelectionVisualService.UnitIsInSelectionBox(worldToScreenPoint, bounds))
                     Select(windowIcon);
+                else
+                    Deselect(windowIcon);
+            }
         }
 
         public void DeselectAll()
@@ -142,7 +158,6 @@ namespace Ui.Services
                 {
                     if (data.layer == LayerMask.NameToLayer("UI"))
                     {
-                        //DeselectAll();
                         return;
                     }
 
@@ -166,7 +181,7 @@ namespace Ui.Services
 
         private void MoveSelected()
         {
-            Debug.Log("MoveSeelcted");
+            Debug.Log("MoveSelected");
 
             Vector3 mousePos = _inputService.MousePosition();
             mousePos.z = 100f;
@@ -181,12 +196,7 @@ namespace Ui.Services
                         Color.magenta, 2);
                     
                     var windowIcon = (WindowIcon) windowBase;
-                    
-                    /*if (!InTerrainBounds(windowIcon.transform.position) || !InTerrainBounds(raycastHit.point))
-                    {
-                        break;
-                    }    */    
-                    
+
                     if (!_windowIdToMousePosition.ContainsKey(windowIcon.WindowIconId))
                         break;
 
@@ -202,22 +212,6 @@ namespace Ui.Services
                     _camera.DisablePanning();
                 }    
             }
-        }
-
-        private bool MinimalTouchReached()
-        {
-            var mousePosition = _inputService.MousePosition();
-            if (_cachedMousePosition == Vector3.zero) _cachedMousePosition = mousePosition;
-
-            var magnitude = _cachedMousePosition.magnitude - mousePosition.magnitude;
-            if (Mathf.Abs(magnitude)
-                > Config.CameraDistanceForMovingIcons && magnitude != 0)
-            {
-                _cachedMousePosition = mousePosition;
-                return true;
-            }
-
-            return false;
         }
     }
 }
